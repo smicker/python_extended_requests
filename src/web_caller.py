@@ -119,7 +119,7 @@ class WebCaller:
         return self.web.post(url, *args, **kwargs)
 
     def close(self):
-        '''Close the seb session'''
+        '''Close the web session'''
         self.web.close()
 
 class TimeoutHTTPAdapter(HTTPAdapter):
