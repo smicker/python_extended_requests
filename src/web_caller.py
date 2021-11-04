@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
+import string
+
 from requests_toolbelt import sessions      # pip install requests-toolbelt
 from requests_toolbelt.utils import dump
 from requests.adapters import HTTPAdapter   # pip install requests
 from requests.packages.urllib3.util.retry import Retry
 from requests.auth import HTTPBasicAuth
-import http # Just for simple logging of web calls
-import string
+
 
 DEFAULT_TIMEOUT = 5 # seconds
 DEFAULT_MAX_RETRIES = 3
@@ -31,7 +32,7 @@ class WebCaller:
 
     Args (All args are OPTIONAL):
 
-    base_url            If you call a lot of pages with the same base url, ex. 
+    base_url            If you call a lot of pages with the same base url, ex.
                         http://mypage.com/main and http://mypage.com/about etc,
                         you can set base_url to http://mypage.com and then you can just use
                         /main or /about as url when you do the calls later on.
@@ -55,13 +56,13 @@ class WebCaller:
             # from server.
             assert_status_hook = lambda response, *args, **kwargs: response.raise_for_status()
             self.web.hooks["response"] = [assert_status_hook]
-        
+
         if retries and retries < 0: retries = 0
         retry_strategy = Retry(
             total = DEFAULT_MAX_RETRIES if retries is None else retries,
             status_forcelist = [429, 500, 502, 503, 504], # The HTTP response codes to retry on
             allowed_methods = ["HEAD", "GET", "PUT", "DELETE", "OPTIONS", "TRACE", "POST"], # The methods to retry on
-            backoff_factor = DEFAULT_BACKOFF_FACTOR 
+            backoff_factor = DEFAULT_BACKOFF_FACTOR
         )
         adapter = TimeoutHTTPAdapter(timeout=timeout, max_retries=retry_strategy)
 
@@ -76,20 +77,20 @@ class WebCaller:
 
         # Enable extended logging (Prints everything, including response body)
         #self.web.hooks["response"] = [self.__logging_hook]
-    
+
     def __logging_hook(self, response, *args, **kwargs):
         '''Used as a response hook when activating extended logging'''
         data = dump.dump_all(response)
         print(data.decode('utf-8'))
-    
-    def setBasicAuth(self, user: string, password: string):
+
+    def set_basic_auth(self, user: string, password: string):
         '''Adds basic authentication to all consecutive web calls'''
         self.auth = HTTPBasicAuth(user, password)
 
-    def __updateArgs(self, **kwargs) -> dict:
+    def __update_args(self, **kwargs) -> dict:
         '''Adds more default values, like auth, to the args sent to web calls'''
         # Add default authentication
-        if not "auth" in kwargs:
+        if "auth" not in kwargs:
             if self.auth:
                 # Add default auth
                 kwargs["auth"] = self.auth
@@ -101,11 +102,11 @@ class WebCaller:
         Note that a default timeout will be used. If no timeout is wanted add the arg timeout=-1
         or if a special timeout is wanted add the timeout=x where x is the amount of seconds.
         '''
-        kwargs = self.__updateArgs(**kwargs)
+        kwargs = self.__update_args(**kwargs)
 
         #print("Calling: " + (self.web.base_url if self.web.base_url else "") + url)
         return self.web.get(url, *args, **kwargs)
-    
+
 
     def web_post(self, url, *args, **kwargs):
         '''
@@ -113,7 +114,7 @@ class WebCaller:
         Note that a default timeout will be used. If no timeout is wanted add the arg timeout=-1
         or if a special timeout is wanted add the timeout=x where x is the amount of seconds.
         '''
-        kwargs = self.__updateArgs(**kwargs)
+        kwargs = self.__update_args(**kwargs)
 
         #print("Calling: " + (self.web.base_url if self.web.base_url else "") + url)
         return self.web.post(url, *args, **kwargs)

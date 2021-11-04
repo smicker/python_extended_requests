@@ -32,5 +32,12 @@ response = webcaller.web_post("/t/3hwxx-1632489409/post", data={"Name": "Micke"}
 ```
 
 # Tests
+First you need to create a test web site that can receive get and post calls.
+To do this:
+1. Browse to http://ptsv2.com/
+2. Click "New Random Toilet"
+3. Note down the Post URL, probably something like /t/8ut6c-1636028392/post
+4. Insert the Post URL at the variable TEST_POSTFIX_URL in test_web_caller.py.
+
 Run unittests from the project folder by:
 ```python3 -m unittest discover -s tests -t .```
