@@ -7,7 +7,7 @@ from requests_toolbelt.utils import dump
 from requests.adapters import HTTPAdapter   # pip install requests
 from requests.packages.urllib3.util.retry import Retry
 from requests.auth import HTTPBasicAuth
-
+# import http # Just for simple logging of web calls, see call http.client.HTTPConnection.debuglevel below
 
 DEFAULT_TIMEOUT = 5 # seconds
 DEFAULT_MAX_RETRIES = 3
